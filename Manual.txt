@@ -1,0 +1,137 @@
+* FLAWS:
+ - This product is incredibly flawed and should not be used in professional projects.
+ - practicalOCR may not pick up on: 
+   Characters with colors that blend in with the background
+   Characters that are so close they're almost conjoined
+   Text with backgrounds that are very colorful or rough.
+   Fonts with unique depictions of the alphabet.
+
+
+
+* HOW TO USE PRACTICALOCR:
+ - Requirements: Python. Download the latest version of Python. As of the time of writing this, you download python from here: https://www.python.org/downloads/
+ - Create a reader file. The name can be whatever, but it must end with the extension: ".py"
+   If you've created the file and the icon hasn't changed to the python icon, chances are the extension of the file you've put in place was seen as a part of the file's name.
+   If you're facing this issue, refer to: https://www.google.com/search?client=firefox-b-d&q=how+to+see+file+extensions
+ - At the beginning of your reader file, import practicalOCR.
+   If Your reader file shares folders with the practicalOCR.py file, this is as simple as writing "import practicalOCR" at the top of your python file.
+   If your reader file is in a folder with another folder that contains practicalOCR.py, write "import <folder_name>.practicalOCR", replacing the folder name with the name of the folder that holds practicalOCR.py
+ - You've now successfully set up the reader. We will now move onto the second step.
+ * THE READING FUNCTION:
+  - The most raw basic barebones version of the reading function will look like this: practicalOCR.read_img("to_read.png")
+    "to_read.png" represents the name of the file that you're trying to read. This can be any name. The name must match where the image is.
+    If your reader file shares its folder with the image you're trying to read, inputting the image name will be as simple as shown above.
+    If your reader file's folder has a folder inside of it which then contains the image, simply add the folder name before the file's name.
+    This is how that would look: practicalOCR.read_img("<folder_name>/to_read.png")
+    You can also read something that is in a completely different folder by grabbing the folder's location starting from the disk. Example: practicalOCR.read_img("C:\Users\<username>\Files\images_to_read\to_read.png")
+  - You can put the returned information into a variable, or you can display it immediately. Here is the best way to write out the information in a single line:
+    input(practicalOCR.read_img("<file>"))
+    Now run your reader!
+  - Generating the image to read is fairly simple! If you haven't trained the OCR on any fonts yet, simply generate an image with text written in Sans-Serif. There is one that comes with the practicalOCR file as a reference.
+    By default, raw, it will work the best with font size of 32.
+  - If your OCR is reading very poorly, refer to filters.
+
+
+
+* FILTERS:
+ - Filters can be added to the function to make the readings better.
+   Here is an example of multiple filters being applied: practicalOCR.read_img("to_read.png", color="black", singles=True, min_font_size=0.8, max_font_size=1.2)
+   There is no limit to how many filters you can use at once and there is no inherent order to how you do them, go crazy.
+ - color=""
+   This filters helps speed up the process and avoid confusion. If the colors of your text is lighter than the surrounding area, use one of the light options, dark otherwise. Exclude filter to check for both colors.
+   Light options: ("white", "light", "w", "1")
+   Dark options: ("black", "dark", "b", "0")
+   All options in either of the groups do the exact same thing for the respective light levels.
+   The filter is applied like so: color="b"
+ - singles=True
+   Set to True by default, if a character is seen to be alone on a line, it will be assumed that there was a reading mistake and the character will be erased.
+   Set to False if you don't want single characters on lonely lines to be erased from the read text.
+   The filter is applied like so: singles=False
+ - min_size=(1, 1)
+   How small can a character get? Automatically set to 1 by 1 pixels, the first number represents the width and the second represents the height. It is suggested that min_font_size is used instead of this filter.
+   The filter is applied like so: min_size=(100, 100)
+ - min_font_size=0
+   How much can a character resize in height. This filter focuses on the minimum.
+   What min_font_size=1 means largely depends on how big the font was in the image that was used to train the OCR.
+   Sans-Serif for example that comes with the OCR was trained with 32 font size, which means min_font_size=1 will make 32 the minimum font size.
+   Though it is important to note, min_font_size=2 isn't 64 font size, as that's not exactly how fonts resize. min_font_size=2 will be 2 times bigger in height than the 32 font size.
+   Tweak this filter around until you get what you're looking for.
+   The filter is applied like so: min_font_size=0.8
+ - max_font_size=1000000
+   Same as the above filter, except maximum size.
+ - fonts=range(10)
+   If you're trained the OCR and you've got multiple fonts in your deck, you can pass in a filter so that it only checks specific ones. This can be useful if you have fonts of different thicknesses and some fail to get picked up.
+   The list that you pass in will contain all font IDs that you want the OCR to look for. Font IDs are notated on the images in your practicalOCR folder.
+   The filter can be applied like so: fonts=range(2)  (this generates a tuple that looks like this (0, 1, 2))
+   OR fonts=(1, 5, 3)
+   OR fonts=(1, )  (Comma is required for the tuple to be recognized)
+ - return_mode="default"
+   The text that you receive can be received in many different ways. It will be "default" by default. Shocker...
+   List of options: ("default", "list", "object", "pixels")
+   "default" returns the text normally.
+   "object" returns the characters that the OCR has found in the image.
+   "pixels" returns the binary pixel board that it generated to read from.
+   The filter is applied like so: return_mode="default"
+ - font_consistency=True
+   Depending on how it perceives the first three characters of your text, it will try to keep the remaining set of characters that it is reading to the same size as the first three.
+   This filter exists to prevent characters like "W", "C", "P" and more, that have awfully similar capital counterparts from being read incorrectly, either as capital or as lowercase.
+   The filter can be turned off like so: font_consistency=False
+ - shade=128
+   Note: Your image read in a binary format where all pixels are either black or white.
+   If your font is really thin in particular places, the OCR may fail to read the text that's written in it.
+   Shade controls the light level at which under, a color is considered dark and which above the color is considered light.
+   Tweak around with the shade until your font is readable. Remember: Increasing the treshold may make thinner texts readable to the OCR, but it may make the characters that are close to one another, conjoined.
+   Sometimes the font may require to have an increased separation between characters if the above problem is true (refer to * FLAWS).
+   The filter is applied like so: shade=190
+ - passing=0.95,
+   How well an object has to match with a character for the OCR to assume it doesn't need to check for any more characters and that it can move onto the next object.
+   Decrease to make the passes easier, increase to make them harder. 1.0 is a perfect match.
+   Set it to 1.01 if you want it to look at everything, no matter how certain it is.
+   The filter is applied like so: passing=0.92
+ - space_occurance=2
+   Higher the number is, lower the space between two characters needs to be for it to be considered a space. Lower it is, less spaces will occur.
+   The filter is applied like so: space_occurance=2.1
+ - new_line="\n"
+   New line by default (starts a new line).
+   Decide what will be between two lines when they're being merged into one string.
+   The filter is applied like so: new_line=" "
+
+
+
+* FONT TRAINING:
+ - So... You want to train the OCR on a font of your own huh. Well I've got a tutorial for you.
+ - Generate an image with the following characters in the following order in the font of your choice: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+   If you don't want numbers, exclude numbers. If you don't want lowercase characters, exclude lowercase characters. If you don't want capital letters, exclude capital letters.
+   If you're going to include things, refer to * TWEAKING THE FONT , since you're going to require telling the OCR about what you're doing.
+   I suggest you make the font size in your image 32. Or if you're gonna be using the OCR for many instances, make it the size that is the most common.
+   Make sure that the text is black and the background if white.
+ - The image must be labeled with an ID, the IDs of your fonts must follow in order for all of them to be perceived. You do this by labeling the image something alone the lines of: "font_<ID>.png".
+ - Delete all the images in the shapes folder if you wish to clear all of the previous training.
+ - Run trainer.py once you're done with making your image and putting it in the same folder as trainer.py. If you get an error, listen to the error and tweak the font accordingly.
+ * TWEAKING THE FONT:
+  - Go into fonts.py. You will see a few things you can tweak there.
+   - read  controls what fonts get looked at during the training process. Refer to * FILTERS - fonts  to learn how you tweak the font training list.
+   - width_limit  controls how thick characters are allowed to be proportional to their height. By default it's set to 2, which means it's allowing to be two times thicker, which after it gets suspicious.
+   - data_override  tweak the defaults of fonts (more on what you are tweaking on the next line).
+     data_override = {"shade": 190, "no_number": True}
+   - data  contains how the trainer views what it's looking at. These are the settings of your fonts and there are 4 options you can change and tweak.
+    - "shade"  controls the treshold for what is considered light and what is considered dark. Refer to * FILTERS - shade  to learn more.
+      data = {0: {"shade": 190}}
+    - "no_lowercase"  controls whether or not the trainer looks for lowercase characters.
+      data = {0: {"no_lowercase": True}}  (doesn't look for them)
+    - "no_capital"  controls whether or not the trainer looks for capital characters.
+      data = {0: {"no_capital": True}}  (doesn't look for them)
+    - "no_number"  controls whether or not the trainer looks for numbers.
+      data = {0: {"no_number": True}}  (doesn't look for them)
+     Here is a flourishing data dictionary:
+     data = {0: {"no_number": True, "shade": 190}, 2: {"no_capital": True, "no_number": True}, 5: {"shade": 160}}
+
+
+
+* COOL FUNCTIONS:
+ - This part is a bit less comprehensive and a bit more complicated. For novices at least. But it isn't necessary in any way.
+ - practicalOCR comes with a few functions.
+  - read_img(image) - The one that this whole manual is about.
+  - image_list(image, shade=128) - Which takes a PIL image and returns a 2D binary list (the 0s and 1s are strings).
+  - get_object_list(pixel_values, color="01") - Takes the list returned from image_list and returns all objects located in the list.
+  - get_object(obj, pixel_values) - Takes an object from the object_list and takes the 2D list from image_list and returns how the object appears in the image_list.
